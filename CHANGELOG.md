@@ -1,3 +1,5 @@
+# Changelog
+
 ## 0.0.1
 
-* TODO: Describe initial release.
+This package can be used as a [TextFormField] with extra paramerters to handle query, itemBuilder, and onSuggestionSelected
