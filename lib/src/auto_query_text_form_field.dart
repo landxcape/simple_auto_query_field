@@ -181,6 +181,7 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
                 onTap: () {
                   /// when tapped, returns the data to the user
                   widget.onSuggestionSelected.call(data);
+
                   /// sets selected value to the query field
                   (widget.textEditingController ??
                           _internalTextEditingController)
