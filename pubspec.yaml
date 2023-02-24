@@ -1,5 +1,5 @@
 name: simple_auto_query_field
-description: An extremely simplified auto querry form field that was inspired from [flutter_typeahead]
+description: An extremely simplified auto query form field. It was inspired from [flutter_typeahead].
 version: 0.0.1
 homepage: https://github.com/landxcape/simple_auto_query_field
 
