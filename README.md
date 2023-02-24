@@ -11,29 +11,61 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages).
 -->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+# Description
+
+This is a simple ***TextFormField*** which shows suggestions to an api call as you type on the input field. It is inspired from ***TypeAhead*** which can be used in a similar way.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- auto query text form field
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+- start with adding ***simple_auto_query_field: ^latest*** to the pubspec.yaml
+
+- or add from the command line
+
+``` dart
+flutter pub get simple_auto_query_field
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+- Import
 
 ```dart
-const like = 'sample';
+import 'package:simple_auto_query_field/simple_auto_query_field.dart';
 ```
+
+- Use it as a ***TextFormField*** and supply querry callbacks, item builder, and suggestions builder, and get suggestions from your supplied api as you type
+
+``` dart
+AutoQueryTextFormField<String?>(
+  autoFocus: true,
+  getImmediateSuggestions: true,
+  queryCallback: (query) async {
+    // call api here and return list of objects
+    return searchPackage(query);
+  },
+  itemBuilder: (BuildContext context, itemData) {
+    return Padding(
+      key: UniqueKey(),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: ListTile(
+        title: Text(itemData ?? 'No Data'),
+      ),
+    );
+  },
+  onSuggestionSelected: (selected) {
+    setState(() {
+      selectedItem = selected;
+    });
+  },
+),
+```
+
+- check ***examples*** for full code
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+This package was inspired from ***flutter_typeahead***, so shoutout to the developer. Contributions to the package are welcome and appriciated.
