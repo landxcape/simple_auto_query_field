@@ -117,7 +117,7 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
       },
     );
 
-    overlay.insert(entry!);
+    overlay?.insert(entry!);
   }
 
   void _hideOverlay() {

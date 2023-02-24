@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/home/l/snap/flutter/common/flutter"
-export "FLUTTER_APPLICATION_PATH=/home/l/Documents/self/flutter_packages/simple_auto_query_field"
+export "FLUTTER_ROOT=C:\src\flutter"
+export "FLUTTER_APPLICATION_PATH=D:\Work\flutter_packages\simple_auto_query_field"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=0.0.1"
