@@ -21,6 +21,8 @@ class AutoQueryTextFormField<T> extends StatefulWidget {
     required this.itemBuilder,
 
     /// returns the selected object
+    /// NOTE: to show selected data on text field, pass [textEditingController]
+    /// and set selected value to display on [textEditingController.text]
     required this.onSuggestionSelected,
 
     /// decoration for TextFormField
@@ -43,7 +45,7 @@ class AutoQueryTextFormField<T> extends StatefulWidget {
   final bool getImmediateSuggestions;
   final Widget Function(BuildContext context, int index)? seperatorBuilder;
   final Widget Function(BuildContext context, T data) itemBuilder;
-  final Future<List<T>?> Function(String query)? queryCallback;
+  final Future<List<T>?> Function(String? query) queryCallback;
   final Function(T item) onSuggestionSelected;
   final TextEditingController? textEditingController;
   final InputDecoration? textInputDecoration;
@@ -52,7 +54,8 @@ class AutoQueryTextFormField<T> extends StatefulWidget {
   final int overlayHeight;
 
   @override
-  State<AutoQueryTextFormField<T>> createState() => _AutoQueryTextFormFieldState<T>();
+  State<AutoQueryTextFormField<T>> createState() =>
+      _AutoQueryTextFormFieldState<T>();
 }
 
 class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
@@ -62,7 +65,8 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
   OverlayEntry? entry;
   String? _query;
 
-  final TextEditingController _internalTextEditingController = TextEditingController();
+  final TextEditingController _internalTextEditingController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -72,7 +76,17 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
 
     _focusNode.addListener(
       () {
-        _focusNode.hasFocus ? (widget.getImmediateSuggestions ? _showOverlay() : _hideOverlay()) : _hideOverlay();
+        if (_focusNode.hasFocus) {
+          if (widget.getImmediateSuggestions) {
+            (widget.textEditingController ?? _internalTextEditingController)
+                .text = '';
+            _showOverlay();
+          } else {
+            _hideOverlay();
+          }
+        } else {
+          _hideOverlay();
+        }
       },
     );
   }
@@ -115,7 +129,7 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
     return Material(
       elevation: 4.0,
       child: FutureBuilder<List<T>?>(
-        future: widget.queryCallback?.call(_query ?? ''),
+        future: widget.queryCallback.call(_query ?? ''),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
@@ -135,14 +149,23 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
           }
 
           return ListView.separated(
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
             itemCount: dataList.length,
-            separatorBuilder: widget.seperatorBuilder ?? _defaultSeperatorBuilder,
+            separatorBuilder:
+                widget.seperatorBuilder ?? _defaultSeperatorBuilder,
             itemBuilder: (context, index) {
               final data = dataList.elementAt(index);
 
               return InkWell(
-                onTap: () => widget.onSuggestionSelected.call(data),
+                onTap: () {
+                  widget.onSuggestionSelected.call(data);
+                  (widget.textEditingController ??
+                          _internalTextEditingController)
+                      .text = data.toString();
+                  _query = data.toString();
+                  _focusNode.unfocus();
+                },
                 child: widget.itemBuilder(context, data),
               );
             },
@@ -152,7 +175,8 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
     );
   }
 
-  Widget _defaultSeperatorBuilder(BuildContext context, int index) => const Divider(height: 0.0);
+  Widget _defaultSeperatorBuilder(BuildContext context, int index) =>
+      const Divider(height: 0.0);
 
   @override
   Widget build(BuildContext context) {
@@ -161,10 +185,11 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
       child: TextFormField(
         autofocus: widget.autoFocus,
         focusNode: _focusNode,
-        controller: widget.textEditingController ?? _internalTextEditingController,
+        controller:
+            widget.textEditingController ?? _internalTextEditingController,
         decoration: widget.textInputDecoration,
         onChanged: (value) {
-          widget.queryCallback?.call(value);
+          widget.queryCallback.call(value);
           setState(() {
             _query = value;
             _hideOverlay();
