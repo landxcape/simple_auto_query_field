@@ -37,7 +37,7 @@ flutter pub get simple_auto_query_field
 import 'package:simple_auto_query_field/simple_auto_query_field.dart';
 ```
 
-- Use it as a ***TextFormField*** and supply querry callbacks, item builder, and suggestions builder, and get suggestions from your supplied api as you type
+- Use it as a ***TextFormField*** and supply query callbacks, item builder, and suggestions builder, and get suggestions from your supplied api as you type
 
 ``` dart
 AutoQueryTextFormField<String?>(

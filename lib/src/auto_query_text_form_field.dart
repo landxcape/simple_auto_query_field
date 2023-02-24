@@ -3,6 +3,22 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class AutoQueryTextFormField<T> extends StatefulWidget {
+  /// Add to get immediate suggestion from API that is passed
+  ///
+  /// get typed query from [queryCallback] and pass that to call the api
+  /// and return the list of data to callback
+  ///
+  /// pass [itemBuilder] to change how the items of the suggestions look
+  /// handle the selected item in [onSuggestionSelected]
+  ///
+  /// pass an optional (by default [false]) [getImmediateSuggestions] true to
+  /// get suggestions immdiately as you focus on the input field
+  ///
+  /// pass an optional (by default a [Divider] of height 0.0)
+  /// [seperatorBuilder] to control how the items are seperated
+  ///
+  /// pass an optional (by default 5) [overlayHeight] which is the multiple
+  /// of the input field's height
   const AutoQueryTextFormField({
     super.key,
 
@@ -97,6 +113,7 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
     super.dispose();
   }
 
+  /// shows suggestions
   _showOverlay() {
     final overlay = Overlay.of(context);
     final renderBox = context.findRenderObject() as RenderBox;
@@ -120,11 +137,13 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
     overlay?.insert(entry!);
   }
 
+  /// hides suggestions
   void _hideOverlay() {
     entry?.remove();
     entry = null;
   }
 
+  /// build overlay of suggestions
   _buildOverlay() {
     return Material(
       elevation: 4.0,
@@ -148,6 +167,7 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
             );
           }
 
+          /// returns a list of suggestions
           return ListView.separated(
             physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
@@ -159,7 +179,9 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
 
               return InkWell(
                 onTap: () {
+                  /// when tapped, returns the data to the user
                   widget.onSuggestionSelected.call(data);
+                  /// sets selected value to the query field
                   (widget.textEditingController ??
                           _internalTextEditingController)
                       .text = data.toString();
@@ -175,6 +197,7 @@ class _AutoQueryTextFormFieldState<T> extends State<AutoQueryTextFormField<T>> {
     );
   }
 
+  /// it is used when no seperation builder is supplied
   Widget _defaultSeperatorBuilder(BuildContext context, int index) =>
       const Divider(height: 0.0);
 
