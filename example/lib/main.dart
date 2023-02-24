@@ -1,17 +1,29 @@
+import 'dart:math';
+
+import 'package:example/demo_package_list.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_auto_query_field/simple_auto_query_field.dart';
-
 
 void main() {
   runApp(const MyApp());
 }
 
-const pubDevSearchApi = 'https://pub.dev/packages?q=';
+Future<List<String>> mockApi(String? query) {
+  return Future.delayed(
+    Duration(milliseconds: Random().nextInt(900) + 100),
+    () {
+      return demoPackageData.where(
+        (item) {
+          return item
+              .contains(query == null || query == '' ? '' : RegExp('$query*'));
+        },
+      ).toList();
+    },
+  );
+}
 
-List<String?> searchPackage(String? querry){
-  try{
-
-  }
+Future<List<String?>> searchPackage(String? query) async {
+  return mockApi(query);
 }
 
 class MyApp extends StatelessWidget {
@@ -20,6 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Simple Auto Query Field Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -29,32 +42,54 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SimpleAutoQueryPreview extends StatelessWidget {
+class SimpleAutoQueryPreview extends StatefulWidget {
   const SimpleAutoQueryPreview({super.key});
 
   @override
+  State<SimpleAutoQueryPreview> createState() => _SimpleAutoQueryPreviewState();
+}
+
+class _SimpleAutoQueryPreviewState extends State<SimpleAutoQueryPreview> {
+  String? selectedItem;
+
+  @override
   Widget build(BuildContext context) {
-    return AutoQueryTextFormField<String>(
-      autoFocus: true,
-      getImmediateSuggestions: true,
-      queryCallback: (query) async {
-        // call api here and return list of objects
-        return;
-      },
-      itemBuilder: (BuildContext context, itemData) {
-        return Padding(
-          key: UniqueKey(),
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: ListTile(
-            title: Text(voucherMode.voucherName ?? ''),
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(selectedItem ?? 'Not Selected'),
+              ),
+              AutoQueryTextFormField<String?>(
+                autoFocus: true,
+                getImmediateSuggestions: true,
+                queryCallback: (query) async {
+                  // call api here and return list of objects
+                  return searchPackage(query);
+                },
+                itemBuilder: (BuildContext context, itemData) {
+                  return Padding(
+                    key: UniqueKey(),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: ListTile(
+                      title: Text(itemData ?? 'No Data'),
+                    ),
+                  );
+                },
+                onSuggestionSelected: (selected) {
+                  setState(() {
+                    selectedItem = selected;
+                  });
+                },
+              ),
+            ],
           ),
-        );
-      },
-      onSuggestionSelected: (selectedVM) {
-        selectedVoucherModeNotifier.state = selectedVM;
-        isVoucherSelectorNotifier.state = false;
-        _getAbbreviatedInvoiceProducts(ref);
-      },
+        ),
+      ),
     );
   }
 }
